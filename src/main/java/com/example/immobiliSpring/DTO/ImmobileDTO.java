@@ -1,43 +1,37 @@
-package com.example.immobiliSpring.entity;
+package com.example.immobiliSpring.DTO;
 
+import com.example.immobiliSpring.entity.Annessi;
+import com.example.immobiliSpring.entity.Proprietari;
 import jakarta.persistence.*;
 
 import java.util.List;
 
-@Entity
-@Table(name = "immobile")
-public class Immobile {
+public class ImmobileDTO {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "idi")
+
     private Integer id;
 
-    @ManyToOne
-    @JoinColumn(name = "xidp")
-    private Proprietari proprietari;
 
-    @Column(name = "tipo")
+    private ProprietariDTO proprietariDTO;
+
+
     private String tipo;
 
-    @Column(name = "vani")
+
     private Integer vani;
 
-    @Column(name = "costo")
+
     private Integer costo;
 
-    @Column(name = "superfice")
     private Integer superfice;
 
-    @Column(name = "anno")
+
     private Integer anno;
-    @OneToMany(
-            mappedBy = ("immobile")
-    )
-    private List<Annessi> listaAnnessi;
 
-    public Immobile(){}
+    private List<AnnessiDTO> listaAnnessiDTO;
 
+
+    public ImmobileDTO(){}
 
     public Integer getId() {
         return id;
@@ -55,12 +49,12 @@ public class Immobile {
         this.tipo = tipo;
     }
 
-    public Proprietari getProprietari() {
-        return proprietari;
+    public ProprietariDTO getProprietariDTO() {
+        return proprietariDTO;
     }
 
-    public void setProprietari(Proprietari proprietari) {
-        this.proprietari = proprietari;
+    public void setProprietariDTO(ProprietariDTO proprietariDTO) {
+        this.proprietariDTO = proprietariDTO;
     }
 
     public Integer getVani() {
@@ -95,11 +89,11 @@ public class Immobile {
         this.anno = anno;
     }
 
-    public List<Annessi> getListaAnnessi() {
-        return listaAnnessi;
+    public List<AnnessiDTO> getListaAnnessiDTO() {
+        return listaAnnessiDTO;
     }
 
-    public void setListaAnnessi(List<Annessi> listaAnnessi) {
-        this.listaAnnessi = listaAnnessi;
+    public void setListaAnnessiDTO(List<AnnessiDTO> listaAnnessiDTO) {
+        this.listaAnnessiDTO = listaAnnessiDTO;
     }
 }
