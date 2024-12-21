@@ -1,8 +1,9 @@
 package com.example.immobiliSpring.DTO;
 
 import com.example.immobiliSpring.entity.Immobile;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
-
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class AnnessiDTO {
 
     private Integer id;

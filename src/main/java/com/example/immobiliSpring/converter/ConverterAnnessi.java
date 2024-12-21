@@ -23,4 +23,20 @@ public class ConverterAnnessi {
         }
         return listaAnnessiDTO;
     }
+
+    public static List<Annessi> convertListToEntityNoIMMBL(List<AnnessiDTO> listaAnnessiDTO){
+        List<Annessi> listaAnnessi = new ArrayList<>();
+
+        if (!listaAnnessiDTO.isEmpty()){
+
+            for (AnnessiDTO annessoDTO : listaAnnessiDTO){
+                Annessi annesso = new Annessi();
+                annesso.setId(annessoDTO.getId());
+                annesso.setTipo(annessoDTO.getTipo());
+                annesso.setSuperficie(annessoDTO.getSuperficie());
+                listaAnnessi.add(annesso);
+            }
+        }
+        return listaAnnessi;
+    }
 }

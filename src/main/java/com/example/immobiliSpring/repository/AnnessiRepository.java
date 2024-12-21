@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 
-public interface AnnessiRepositorìy extends JpaRepository<Annessi, Integer> {
+public interface AnnessiRepository extends JpaRepository<Annessi, Integer> {
 }

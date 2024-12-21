@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 
 @Entity
 @Table(name = "annessi")
-@JsonInclude(JsonInclude.Include.NON_NULL)
+
 public class Annessi {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,6 +36,7 @@ public class Annessi {
     }
 
     public Immobile getImmobile() {
+
         return immobile;
     }
 

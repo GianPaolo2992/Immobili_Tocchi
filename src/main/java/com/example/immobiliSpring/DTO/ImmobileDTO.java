@@ -2,10 +2,11 @@ package com.example.immobiliSpring.DTO;
 
 import com.example.immobiliSpring.entity.Annessi;
 import com.example.immobiliSpring.entity.Proprietari;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
 
 import java.util.List;
-
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ImmobileDTO {
 
 
