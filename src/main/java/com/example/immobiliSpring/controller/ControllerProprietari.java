@@ -46,5 +46,36 @@ public class ControllerProprietari {
         return serviceProprietari.AssocateImmobile(idProp,idImmbl);
     }
 
+    @GetMapping("/getSumSuperficeProp")
+    public List<Object[]> sumSuperficeProp() {
+        return serviceProprietari.getSumSuperficeProp();
+    }
+    @GetMapping("/getSumSuperficePropName")
+    public List<Object> sumSuperficePropName( @RequestParam String nome,@RequestParam String cognome) {
+        return serviceProprietari.sumSuperficePropName(nome,cognome);
+    }
+
+
+    @GetMapping("/getPropOfVilla")
+    public List<Object[]> getPropOfVilla() {
+        return serviceProprietari.getPropOfVilla();
+    }
+    @GetMapping("/getPropAppartmentWithBox")
+    public List<Object[]> propAppartmentWithBox() {
+        return serviceProprietari.getPropAppartmentWithBox();
+    }
+
+    @GetMapping("/getPropTotVani")
+    public List<Object[]> propTotVani() {
+        return serviceProprietari.getPropTotVani();
+    }
+
+
+
+    @GetMapping("/getOwnersWithMore400MQ")
+    public List<Object[]>  ownersWithMore400MQ() {
+        return serviceProprietari.getOwnersWithMore400MQ();
+    }
+
 
 }

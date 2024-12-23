@@ -28,6 +28,15 @@ public class ConverterProprietari {
 
         return proprietariDTO;
     }
+    public static Proprietari converterToEntityXAnnessi(ProprietariDTO proprietariDTO) {
+        Proprietari proprietari = new Proprietari();
+
+        proprietari.setId(proprietariDTO.getId());
+        proprietari.setNome(proprietariDTO.getNome());
+        proprietari.setCognome(proprietariDTO.getCognome());
+
+        return proprietari;
+    }
 
     public static Proprietari converterToEntity(ProprietariDTO proprietariDTO) {
         Proprietari proprietari = new Proprietari();

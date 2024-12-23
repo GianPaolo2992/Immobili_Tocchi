@@ -8,6 +8,30 @@ import java.util.List;
 
 public class ConverterAnnessi {
 
+    public static AnnessiDTO ConvertToDTO(Annessi annessi) {
+        AnnessiDTO annessiDTO = new AnnessiDTO();
+        annessiDTO.setId(annessi.getId());
+        annessiDTO.setTipo(annessi.getTipo());
+        annessiDTO.setSuperficie(annessi.getSuperficie());
+        if(annessi.getImmobile() != null) {
+            annessiDTO.setImmobileDTO(ConverterImmobile.ConvertToDTOXAnnessi(annessi.getImmobile()));
+
+        }
+        return annessiDTO;
+    }
+
+    public static Annessi ConvertToEntity(AnnessiDTO annessiDTO) {
+        Annessi annessi = new Annessi();
+        annessi.setId(annessiDTO.getId());
+        annessi.setTipo(annessiDTO.getTipo());
+        annessi.setSuperficie(annessiDTO.getSuperficie());
+        if(annessiDTO.getImmobileDTO() != null) {
+            annessi.setImmobile(ConverterImmobile.ConvertToEntityXAnnessi(annessiDTO.getImmobileDTO()));
+
+        }
+        return annessi;
+    }
+
     public static List<AnnessiDTO> convertListToDTONoIMMBL(List<Annessi> listaAnnessi){
         List<AnnessiDTO> listaAnnessiDTO = new ArrayList<>();
 

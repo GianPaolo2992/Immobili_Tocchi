@@ -50,4 +50,14 @@ public class ControllerImmobile {
         return serviceImmobili.DissociaAnnessi(id);
     }
 
+    @GetMapping("/getVillaWithGarden")
+    public List<Object[]> VilleWithGarden() {
+        return serviceImmobili.getVillaWithGarden();
+    }
+
+    @GetMapping("/findImmobiliAfter1996")
+    public List<ImmobileDTO> findImmobiliAfter1996() {
+        return serviceImmobili.findImmobiliAfter1996();
+    }
+
 }

@@ -126,4 +126,37 @@ public class ServiceProprietari {
         }
     }
 
+    public List<Object[]> getSumSuperficeProp() {
+        return prorpietariRepository.sumSuperficeProp();
+    }
+
+    public List<Object> sumSuperficePropName( String nome,String cognome) {
+        return prorpietariRepository.sumSuperficePropName(nome,cognome);
+    }
+
+    public List<Object[]> getPropOfVilla() {
+        return prorpietariRepository.propOfVilla();
+    }
+
+   public List<Object[]> getPropAppartmentWithBox() {
+        return prorpietariRepository.propAppartmentWithBox();
+    }
+
+    public List<Object[]> getPropTotVani() {
+//        List<ProprietariDTO> listPropVaniDTO = new ArrayList<>();
+//        List<Proprietari> listPropVani = prorpietariRepository.propTotVani();
+//        if (!listPropVani.isEmpty()) {
+//            for (Proprietari proprietari : listPropVani) {
+//                ProprietariDTO proprietariDTO = ConverterProprietari.converterToDTO(proprietari);
+//                    listPropVaniDTO.add(proprietariDTO);
+//            }
+//        }
+//        return listPropVaniDTO;
+        return prorpietariRepository.propTotVani();
+    }
+
+    public List<Object[]> getOwnersWithMore400MQ() {
+        return prorpietariRepository.ownersWithMore400MQ();
+    }
+
 }

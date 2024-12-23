@@ -19,7 +19,7 @@ public class ConverterImmobile {
                 immobileDTO.setTipo(immobile.getTipo());
                 immobileDTO.setVani(immobile.getVani());
                 immobileDTO.setCosto(immobile.getCosto());
-                immobileDTO.setSuperfice(immobile.getSuperfice());
+                immobileDTO.setSuperfice(immobile.getSuperficie());
                 immobileDTO.setAnno(immobile.getAnno());
                 if(immobile.getListaAnnessi() != null) {
                     immobileDTO.setListaAnnessiDTO(ConverterAnnessi.convertListToDTONoIMMBL(immobile.getListaAnnessi()));
@@ -41,7 +41,7 @@ public class ConverterImmobile {
                 //no proprietario
                 immobile.setTipo(immobileDTO.getTipo());
                 immobile.setVani(immobileDTO.getCosto());
-                immobile.setSuperfice(immobileDTO.getSuperfice());
+                immobile.setSuperficie(immobileDTO.getSuperfice());
                 immobile.setAnno(immobileDTO.getAnno());
                 if(immobile.getListaAnnessi() != null) {
                     immobile.setListaAnnessi(ConverterAnnessi.convertListToEntityNoIMMBL(immobileDTO.getListaAnnessiDTO()));
@@ -54,7 +54,35 @@ public class ConverterImmobile {
     }
 
 
+    public static ImmobileDTO ConvertToDTOXAnnessi(Immobile immobile) {
+        ImmobileDTO immobileDTO = new ImmobileDTO();
 
+        immobileDTO.setId(immobile.getId());
+        if ( immobile.getProprietari() != null) {
+            immobileDTO.setProprietariDTO(ConverterProprietari.converterToDTOXImmobile(immobile.getProprietari()));
+        }
+        immobileDTO.setTipo(immobile.getTipo());
+        immobileDTO.setVani(immobile.getVani());
+        immobileDTO.setCosto(immobile.getCosto());
+        immobileDTO.setSuperfice(immobile.getSuperficie());
+        immobileDTO.setAnno(immobile.getAnno());
+
+        return immobileDTO;
+    }
+    public static Immobile ConvertToEntityXAnnessi(ImmobileDTO immobileDTO) {
+        Immobile immobile = new Immobile();
+
+        immobile.setId(immobileDTO.getId());
+        if ( immobile.getProprietari() != null) {
+            immobile.setProprietari(ConverterProprietari.converterToEntityXAnnessi(immobileDTO.getProprietariDTO()));
+        }
+        immobile.setTipo(immobileDTO.getTipo());
+        immobile.setVani(immobileDTO.getVani());
+        immobile.setCosto(immobileDTO.getSuperfice());
+        immobile.setAnno(immobileDTO.getAnno());
+
+        return immobile;
+    }
     public static ImmobileDTO ConvertToDTO(Immobile immobile) {
         ImmobileDTO immobileDTO = new ImmobileDTO();
 
@@ -65,7 +93,7 @@ public class ConverterImmobile {
         immobileDTO.setTipo(immobile.getTipo());
         immobileDTO.setVani(immobile.getVani());
         immobileDTO.setCosto(immobile.getCosto());
-        immobileDTO.setSuperfice(immobile.getSuperfice());
+        immobileDTO.setSuperfice(immobile.getSuperficie());
         immobileDTO.setAnno(immobile.getAnno());
         if(immobile.getListaAnnessi() != null) {
             immobileDTO.setListaAnnessiDTO(ConverterAnnessi.convertListToDTONoIMMBL(immobile.getListaAnnessi()));
@@ -83,7 +111,7 @@ public class ConverterImmobile {
         immobile.setTipo(immobileDTO.getTipo());
         immobile.setVani(immobileDTO.getVani());
         immobile.setCosto(immobileDTO.getCosto());
-        immobile.setSuperfice(immobileDTO.getSuperfice());
+        immobile.setSuperficie(immobileDTO.getSuperfice());
         immobile.setAnno(immobileDTO.getAnno());
         if(immobileDTO.getListaAnnessiDTO() != null) {
             immobile.setListaAnnessi(ConverterAnnessi.convertListToEntityNoIMMBL(immobileDTO.getListaAnnessiDTO()));

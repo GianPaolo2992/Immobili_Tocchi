@@ -27,7 +27,7 @@ public class Immobile {
     private Integer costo;
 
     @Column(name = "superfice")
-    private Integer superfice;
+    private Integer superficie;
 
     @Column(name = "anno")
     private Integer anno;
@@ -79,12 +79,12 @@ public class Immobile {
         this.costo = costo;
     }
 
-    public Integer getSuperfice() {
-        return superfice;
+    public Integer getSuperficie() {
+        return superficie;
     }
 
-    public void setSuperfice(Integer superfice) {
-        this.superfice = superfice;
+    public void setSuperficie(Integer superfice) {
+        this.superficie = superfice;
     }
 
     public Integer getAnno() {

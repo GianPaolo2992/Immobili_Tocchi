@@ -19,15 +19,16 @@ public class ServiceImmobili {
     private final ImmobileRepository immobileRepository;
     private final AnnessiRepository annessiRepository;
 
-    public  ServiceImmobili(ImmobileRepository immobileRepository,AnnessiRepository annessiRepository){
+    public ServiceImmobili(ImmobileRepository immobileRepository, AnnessiRepository annessiRepository) {
         this.immobileRepository = immobileRepository;
         this.annessiRepository = annessiRepository;
     }
-    public List<ImmobileDTO> getAllImmobili(){
+
+    public List<ImmobileDTO> getAllImmobili() {
         List<ImmobileDTO> immobileDTOList = new ArrayList<>();
         List<Immobile> immobileList = immobileRepository.findAll();
-        if(!immobileList.isEmpty()) {
-            for(Immobile immobile : immobileList) {
+        if (!immobileList.isEmpty()) {
+            for (Immobile immobile : immobileList) {
                 ImmobileDTO immobileDTO = new ImmobileDTO();
                 immobileDTO = ConverterImmobile.ConvertToDTO(immobile);
                 immobileDTOList.add(immobileDTO);
@@ -38,9 +39,9 @@ public class ServiceImmobili {
         }
     }
 
-    public ImmobileDTO getImmobileById(Integer id){
-       Optional<Immobile> immobileOpt = immobileRepository.findById(id);
-        if(immobileOpt.isPresent()) {
+    public ImmobileDTO getImmobileById(Integer id) {
+        Optional<Immobile> immobileOpt = immobileRepository.findById(id);
+        if (immobileOpt.isPresent()) {
 
             return ConverterImmobile.ConvertToDTO(immobileOpt.get());
         } else {
@@ -48,16 +49,17 @@ public class ServiceImmobili {
         }
     }
 
-    public ImmobileDTO insertImmobile(ImmobileDTO immobileDTO){
-        Immobile immobileSaved =ConverterImmobile.ConvertToEntity(immobileDTO);
+    public ImmobileDTO insertImmobile(ImmobileDTO immobileDTO) {
+        Immobile immobileSaved = ConverterImmobile.ConvertToEntity(immobileDTO);
         immobileRepository.save(immobileSaved);
         return ConverterImmobile.ConvertToDTO(immobileSaved);
-    };
+    }
 
-    public ImmobileDTO updateImmobile(Integer id,ImmobileDTO immobileDTO) {
+
+    public ImmobileDTO updateImmobile(Integer id, ImmobileDTO immobileDTO) {
         Optional<Immobile> immobileOpt = immobileRepository.findById(id);
 
-        if(immobileOpt.isPresent()) {
+        if (immobileOpt.isPresent()) {
 
             immobileDTO.setId(id);
             Immobile immobileUpdated = ConverterImmobile.ConvertToEntity(immobileDTO);
@@ -74,9 +76,9 @@ public class ServiceImmobili {
         if (immobileOPT.isPresent()) {
             ImmobileDTO immobileDeleted = ConverterImmobile.ConvertToDTO(immobileOPT.get());
             if (immobileOPT.get().getProprietari() == null) {
-                if (immobileOPT.get().getListaAnnessi() !=null) {
+                if (immobileOPT.get().getListaAnnessi() != null) {
 
-                    for (Annessi annessi : immobileOPT.get().getListaAnnessi()){
+                    for (Annessi annessi : immobileOPT.get().getListaAnnessi()) {
                         annessi.setImmobile(null);
                     }
                 }
@@ -86,34 +88,34 @@ public class ServiceImmobili {
 
 
             return immobileDeleted;
-        }else {
+        } else {
             throw new EntityNotFoundException("Entity Not Found");
         }
     }
 
-    public  ImmobileDTO AssociateAnnessi(Integer idAnnesso,Integer idImmbl) {
-      Optional<Immobile> immobileOptional = immobileRepository.findById(idImmbl);
-      Optional<Annessi> annessiOptional = annessiRepository.findById(idAnnesso);
+    public ImmobileDTO AssociateAnnessi(Integer idAnnesso, Integer idImmbl) {
+        Optional<Immobile> immobileOptional = immobileRepository.findById(idImmbl);
+        Optional<Annessi> annessiOptional = annessiRepository.findById(idAnnesso);
 
-      if (annessiOptional.isPresent() && immobileOptional.isPresent() && annessiOptional.get().getImmobile() == null) {
-          immobileOptional.get().getListaAnnessi().add(annessiOptional.get());
-          annessiOptional.get().setImmobile(immobileOptional.get());
+        if (annessiOptional.isPresent() && immobileOptional.isPresent() && annessiOptional.get().getImmobile() == null) {
+            immobileOptional.get().getListaAnnessi().add(annessiOptional.get());
+            annessiOptional.get().setImmobile(immobileOptional.get());
 
-          annessiRepository.save(annessiOptional.get());
-          immobileRepository.save(immobileOptional.get());
+            annessiRepository.save(annessiOptional.get());
+            immobileRepository.save(immobileOptional.get());
 
-          return ConverterImmobile.ConvertToDTO(immobileOptional.get());
-      } else {
-          throw new EntityNotFoundException("Entity Not Found");
-      }
+            return ConverterImmobile.ConvertToDTO(immobileOptional.get());
+        } else {
+            throw new EntityNotFoundException("Entity Not Found");
+        }
 
     }
 
     public ImmobileDTO DissociaAnnessi(Integer id) {
         Optional<Annessi> annessiOptional = annessiRepository.findById(id);
         Optional<Immobile> immobileOptional = immobileRepository.findById(annessiOptional.get().getImmobile().getId());
-        if (immobileOptional.isPresent()){
-            if ( immobileOptional.get().getListaAnnessi().contains(annessiOptional.get()) && annessiOptional.get().getImmobile() == immobileOptional.get()) {
+        if (immobileOptional.isPresent()) {
+            if (immobileOptional.get().getListaAnnessi().contains(annessiOptional.get()) && annessiOptional.get().getImmobile() == immobileOptional.get()) {
 
                 immobileOptional.get().getListaAnnessi().remove(annessiOptional.get());
                 annessiOptional.get().setImmobile(null);
@@ -128,5 +130,25 @@ public class ServiceImmobili {
         }
         return ConverterImmobile.ConvertToDTO(immobileOptional.get());
 
+    }
+
+    public List<Object[]> getVillaWithGarden() {
+        return immobileRepository.VilleWithGarden();
+    }
+
+
+
+    public List<ImmobileDTO> findImmobiliAfter1996() {
+        List<ImmobileDTO> listImmobiliBefore1996 = new ArrayList<>();
+        List<Immobile> immobileList = immobileRepository.findImmobiliAfter1996();
+        if (!immobileList.isEmpty()){
+            for (Immobile immobile: immobileList) {
+                ImmobileDTO immobileDTO = ConverterImmobile.ConvertToDTO(immobile);
+                listImmobiliBefore1996.add(immobileDTO);
+
+            }
+        }
+
+        return listImmobiliBefore1996;
     }
 }

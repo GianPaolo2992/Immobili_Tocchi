@@ -2,8 +2,10 @@ package com.example.immobiliSpring.DTO;
 
 import com.example.immobiliSpring.entity.Immobile;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jakarta.persistence.*;
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonPropertyOrder({"id","tipo","superficie","immobileDTO"})
 public class AnnessiDTO {
 
     private Integer id;
