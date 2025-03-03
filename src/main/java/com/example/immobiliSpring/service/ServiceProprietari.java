@@ -1,12 +1,15 @@
 package com.example.immobiliSpring.service;
 
+import com.example.immobiliSpring.DTO.ImmobileDTO;
 import com.example.immobiliSpring.DTO.ProprietariDTO;
 import com.example.immobiliSpring.converter.ConverterProprietari;
+import com.example.immobiliSpring.entity.Annessi;
 import com.example.immobiliSpring.entity.Immobile;
 import com.example.immobiliSpring.entity.Proprietari;
 import com.example.immobiliSpring.repository.ImmobileRepository;
 import com.example.immobiliSpring.repository.ProrpietariRepository;
 import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,15 +21,18 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class ServiceProprietari {
 
     private final ProrpietariRepository prorpietariRepository;
     private final ImmobileRepository immobileRepository;
+    private final ConverterProprietari converterProprietari;
 
-    public ServiceProprietari(ProrpietariRepository prorpietariRepository, ImmobileRepository immobileRepository) {
-        this.prorpietariRepository = prorpietariRepository;
-        this.immobileRepository = immobileRepository;
-    }
+//    public ServiceProprietari(ProrpietariRepository prorpietariRepository, ImmobileRepository immobileRepository, ConverterProprietari converterProprietari) {
+//        this.prorpietariRepository = prorpietariRepository;
+//        this.immobileRepository = immobileRepository;
+//        this.converterProprietari = converterProprietari;
+//    }
 
     @Transactional
     public ProprietariDTO getProprietariById(Integer id) {
@@ -34,8 +40,8 @@ public class ServiceProprietari {
 
         if (proprietariOPT.isPresent()) {
 
-            ProprietariDTO proprietariDTO = ConverterProprietari.converterToDTO(proprietariOPT.get());
-            return proprietariDTO;
+            return converterProprietari.converterToDTO(proprietariOPT.get());
+
         } else {
             throw new EntityNotFoundException("Proprietario Not Found");
         }
@@ -47,57 +53,74 @@ public class ServiceProprietari {
         List<Proprietari> listaProprietari = prorpietariRepository.findAll();
 
         for (Proprietari prop : listaProprietari) {
-            ProprietariDTO propDTO = ConverterProprietari.converterToDTO(prop);
+            ProprietariDTO propDTO = this.converterProprietari.converterToDTO(prop);
             listaPropDTO.add(propDTO);
         }
 
         return listaPropDTO;
     }
 
-    @Transactional
-    public ProprietariDTO insertProprietari(ProprietariDTO proprietariDTO) {
-
-        Proprietari propSaved = ConverterProprietari.converterToEntityXInsert(proprietariDTO);
-        prorpietariRepository.save(propSaved);
-        return ConverterProprietari.converterToDTO(propSaved);
-    }
 
     @Transactional
+    public ProprietariDTO insertProprietario(ProprietariDTO proprietariDTO) {
+        Proprietari propSaved = converterProprietari.converterToEntityXInsert(proprietariDTO);
+        try {
 
-    public ProprietariDTO updateProprietario(Integer id, ProprietariDTO proprietariDTO) {
-        Optional<Proprietari> propOPT = prorpietariRepository.findById(id);
+            prorpietariRepository.save(propSaved);
 
-        if (propOPT.isPresent()) {
-            proprietariDTO.setId(id);
-//           propOPT.get().setNome(proprietariDTO.getNome());
-//           propOPT.get().setCognome(proprietariDTO.getCognome());
+            System.out.println("Proprietario salvato: " + propSaved);
+            return this.converterProprietari.converterToDTO(propSaved);
+        } catch (Exception e) {
 
-//           Proprietari propUpdated = propOPT.get();
-            Proprietari propUpdated = ConverterProprietari.converterToEntityXInsert(proprietariDTO);
-            prorpietariRepository.save(propOPT.get());
-            return ConverterProprietari.converterToDTO(propUpdated);
-        } else {
-            throw new EntityNotFoundException("Proprietario Not Found");
+            System.err.println("Errore durante l'inserimento del proprietario: " + e.getMessage());
+
+            throw new RuntimeException("Errore durante l'inserimento del proprietario", e);
         }
     }
 
-    @Transactional
+
+    //    @Transactional
+    public ProprietariDTO updateProprietario(Integer id, ProprietariDTO proprietariDTO) {
+        Proprietari propOPT = prorpietariRepository.findById(id).orElseThrow(() -> new RuntimeException("Proprietario non trovato"));
+
+
+        propOPT = converterProprietari.converterToEntityXUpdate(proprietariDTO, propOPT);
+        try {
+
+            prorpietariRepository.save(propOPT);
+
+            System.out.println("Proprietario salvato: " + propOPT);
+            return this.converterProprietari.converterToDTO(propOPT);
+        } catch (Exception e) {
+
+            System.err.println("Errore durante l'inserimento del proprietario: " + e.getMessage());
+
+            throw new RuntimeException("Errore durante l'inserimento del proprietario", e);
+        }
+
+    }
+
+    //    @Transactional
     public ProprietariDTO deleteProprietario(Integer id) {
-        Optional<Proprietari> propOPT = prorpietariRepository.findById(id);
-        if (propOPT.isPresent()) {
-
-            Proprietari propDeleted = propOPT.get();
-
-            if (!propDeleted.getListaImmobili().isEmpty()) {
-                for (Immobile immobile : propDeleted.getListaImmobili()) {
+        Proprietari propOPT = prorpietariRepository.findById(id).orElseThrow(() -> new RuntimeException("prop non trovato"));
+        try {
+            if (propOPT.getListaImmobili() != null) {
+                List<Immobile> immobileListCopy = new ArrayList<>(propOPT.getListaImmobili());
+                for (Immobile immobile : immobileListCopy) {
+                    Immobile immobileEntity = immobileRepository.findById(immobile.getId()).orElseThrow(
+                            () -> new EntityNotFoundException("Immobile non trovato"));
                     immobile.setProprietari(null);
-                }
-            }
+                    immobileRepository.save(immobileEntity);
 
-            prorpietariRepository.delete(propOPT.get());
-            return ConverterProprietari.converterToDTO(propDeleted);
-        } else {
-            throw new EntityNotFoundException("Prop Not Found");
+                }
+                prorpietariRepository.delete(propOPT);
+                return this.converterProprietari.converterToDTO(propOPT);
+            } else {
+                throw new EntityNotFoundException("Lista immobili null");
+            }
+        } catch (Exception e) {
+            System.err.println("Errore durante l'eliminazione dell'immobile: " + e.getMessage());
+            throw new RuntimeException("Errore durante l'eliminazione dell'immobile", e);
         }
     }
 
@@ -105,9 +128,9 @@ public class ServiceProprietari {
     public ProprietariDTO AssocateImmobile(Integer idProp, Integer idImmbl) {
         Optional<Proprietari> propOPT = prorpietariRepository.findById(idProp);
         Optional<Immobile> immobileOPT = immobileRepository.findById(idImmbl);
-        if (propOPT.isPresent() && immobileOPT.isPresent()  ) {
+        if (propOPT.isPresent() && immobileOPT.isPresent()) {
             Proprietari propAssociate = propOPT.get();
-            if(immobileOPT.get().getProprietari() == null ) {
+            if (immobileOPT.get().getProprietari() == null) {
 
                 Immobile immblAssociate = immobileOPT.get();
 
@@ -117,10 +140,10 @@ public class ServiceProprietari {
                 prorpietariRepository.save(propOPT.get());
                 immobileRepository.save(immblAssociate);
 
-            }else{
+            } else {
                 System.out.println("non è possibile associare questo immobile perche appartenente ad un altro prop");
             }
-            return ConverterProprietari.converterToDTO(propAssociate);
+            return this.converterProprietari.converterToDTO(propAssociate);
         } else {
             throw new EntityNotFoundException("Prop Not Found");
         }
@@ -130,15 +153,15 @@ public class ServiceProprietari {
         return prorpietariRepository.sumSuperficeProp();
     }
 
-    public List<Object> sumSuperficePropName( String nome,String cognome) {
-        return prorpietariRepository.sumSuperficePropName(nome,cognome);
+    public List<Object> sumSuperficePropName(String nome, String cognome) {
+        return prorpietariRepository.sumSuperficePropName(nome, cognome);
     }
 
     public List<Object[]> getPropOfVilla() {
         return prorpietariRepository.propOfVilla();
     }
 
-   public List<Object[]> getPropAppartmentWithBox() {
+    public List<Object[]> getPropAppartmentWithBox() {
         return prorpietariRepository.propAppartmentWithBox();
     }
 

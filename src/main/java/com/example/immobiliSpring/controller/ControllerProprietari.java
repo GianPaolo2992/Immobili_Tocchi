@@ -2,6 +2,8 @@ package com.example.immobiliSpring.controller;
 
 import com.example.immobiliSpring.DTO.ProprietariDTO;
 import com.example.immobiliSpring.service.ServiceProprietari;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,11 +27,20 @@ public class ControllerProprietari {
     public List<ProprietariDTO> getAllProprietari() {
         return serviceProprietari.getAllProprietari();
     }
-
-    @PostMapping("/insertProp")
-    public ProprietariDTO insertProprietari(@RequestBody ProprietariDTO proprietariDTO) {
-        return serviceProprietari.insertProprietari(proprietariDTO);
-    }
+//
+//    @PostMapping("/insertProp")
+//    public ProprietariDTO insertProprietari(@RequestBody ProprietariDTO proprietariDTO) {
+//        return serviceProprietari.insertProprietari(proprietariDTO);
+//    }
+@PostMapping("/insertProp")
+public ResponseEntity<ProprietariDTO> insertProprietari(@RequestBody ProprietariDTO proprietariDTO) {
+//    try {
+        ProprietariDTO savedProprietario = serviceProprietari.insertProprietario(proprietariDTO);
+        return new ResponseEntity<>(savedProprietario, HttpStatus.CREATED);
+//    } catch (Exception e) {
+//        return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+//    }
+}
 
     @PutMapping("/updatePropById/{id}")
     public ProprietariDTO updateProprietario(@PathVariable("id")Integer id,@RequestBody ProprietariDTO proprietariDTO) {

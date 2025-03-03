@@ -1,11 +1,15 @@
 package com.example.immobiliSpring.service;
 
+import com.example.immobiliSpring.DTO.AnnessiDTO;
 import com.example.immobiliSpring.DTO.ImmobileDTO;
+import com.example.immobiliSpring.converter.ConverterAnnessi;
 import com.example.immobiliSpring.converter.ConverterImmobile;
 import com.example.immobiliSpring.entity.Annessi;
 import com.example.immobiliSpring.entity.Immobile;
+import com.example.immobiliSpring.entity.Proprietari;
 import com.example.immobiliSpring.repository.AnnessiRepository;
 import com.example.immobiliSpring.repository.ImmobileRepository;
+import com.example.immobiliSpring.repository.ProrpietariRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -15,13 +19,17 @@ import java.util.Optional;
 
 @Service
 public class ServiceImmobili {
-
+    private boolean isDelete = false;
     private final ImmobileRepository immobileRepository;
     private final AnnessiRepository annessiRepository;
+    private final ProrpietariRepository proprietariRepository;
+    private final ConverterImmobile converterImmobile;
 
-    public ServiceImmobili(ImmobileRepository immobileRepository, AnnessiRepository annessiRepository) {
+    public ServiceImmobili(ProrpietariRepository proprietariRepository, ImmobileRepository immobileRepository, AnnessiRepository annessiRepository, ConverterImmobile converterImmobile) {
         this.immobileRepository = immobileRepository;
         this.annessiRepository = annessiRepository;
+        this.converterImmobile = converterImmobile;
+        this.proprietariRepository = proprietariRepository;
     }
 
     public List<ImmobileDTO> getAllImmobili() {
@@ -50,48 +58,46 @@ public class ServiceImmobili {
     }
 
     public ImmobileDTO insertImmobile(ImmobileDTO immobileDTO) {
-        Immobile immobileSaved = ConverterImmobile.ConvertToEntity(immobileDTO);
+        Immobile immobileSaved = this.converterImmobile.ConvertToEntity(immobileDTO);
         immobileRepository.save(immobileSaved);
         return ConverterImmobile.ConvertToDTO(immobileSaved);
     }
 
 
     public ImmobileDTO updateImmobile(Integer id, ImmobileDTO immobileDTO) {
-        Optional<Immobile> immobileOpt = immobileRepository.findById(id);
+        Immobile immobileOpt = immobileRepository.findById(id).orElseThrow(() -> new RuntimeException("immobilie non trovato"));
+        immobileOpt = this.converterImmobile.ConvertToEntityXUpdate(immobileDTO, immobileOpt);
 
-        if (immobileOpt.isPresent()) {
+        try {
+            immobileRepository.save(immobileOpt);
+            return ConverterImmobile.ConvertToDTO(immobileOpt);
+        } catch (Exception e) {
 
-            immobileDTO.setId(id);
-            Immobile immobileUpdated = ConverterImmobile.ConvertToEntity(immobileDTO);
-            immobileRepository.save(immobileUpdated);
-            return ConverterImmobile.ConvertToDTO(immobileUpdated);
-        } else {
-            throw new EntityNotFoundException("Entity Not Found");
+            System.err.println("Errore durante l'inserimento del proprietario: " + e.getMessage());
+
+            throw new RuntimeException("Errore durante l'inserimento del proprietario", e);
         }
+
+
     }
+
 
     public ImmobileDTO deleteImmobileById(Integer id) {
-        Optional<Immobile> immobileOPT = immobileRepository.findById(id);
-
-        if (immobileOPT.isPresent()) {
-            ImmobileDTO immobileDeleted = ConverterImmobile.ConvertToDTO(immobileOPT.get());
-            if (immobileOPT.get().getProprietari() == null) {
-                if (immobileOPT.get().getListaAnnessi() != null) {
-
-                    for (Annessi annessi : immobileOPT.get().getListaAnnessi()) {
-                        annessi.setImmobile(null);
-                    }
-                }
-
-                immobileRepository.delete(immobileOPT.get());
+        Immobile immobileOPT = immobileRepository.findById(id).orElseThrow(() -> new RuntimeException("immobile non trovato"));
+        List<Annessi> annessiListCopy = new ArrayList<>();
+        if (!immobileOPT.getListaAnnessi().isEmpty()) {
+            annessiListCopy = immobileOPT.getListaAnnessi();
+            for (Annessi annesso : annessiListCopy) {
+                Annessi annessoEntity = annessiRepository.findById(annesso.getId()).orElseThrow();
+                annessoEntity.setImmobile(null);
+                annessiRepository.save(annessoEntity);
             }
 
-
-            return immobileDeleted;
-        } else {
-            throw new EntityNotFoundException("Entity Not Found");
         }
+        immobileRepository.delete(immobileOPT);
+        return ConverterImmobile.ConvertToDTO(immobileOPT);
     }
+
 
     public ImmobileDTO AssociateAnnessi(Integer idAnnesso, Integer idImmbl) {
         Optional<Immobile> immobileOptional = immobileRepository.findById(idImmbl);
@@ -112,24 +118,28 @@ public class ServiceImmobili {
     }
 
     public ImmobileDTO DissociaAnnessi(Integer id) {
-        Optional<Annessi> annessiOptional = annessiRepository.findById(id);
-        Optional<Immobile> immobileOptional = immobileRepository.findById(annessiOptional.get().getImmobile().getId());
-        if (immobileOptional.isPresent()) {
-            if (immobileOptional.get().getListaAnnessi().contains(annessiOptional.get()) && annessiOptional.get().getImmobile() == immobileOptional.get()) {
+        Annessi annesso = annessiRepository.findById(id).orElseThrow(() -> new RuntimeException("annesso non trovato"));
+        Immobile immobile = immobileRepository.findById(annesso.getImmobile().getId()).orElseThrow(() -> new RuntimeException("immobile on trovato non trovato"));
+        try {
+            if (immobile.getListaAnnessi().contains(annesso) && annesso.getImmobile() == immobile) {
 
-                immobileOptional.get().getListaAnnessi().remove(annessiOptional.get());
-                annessiOptional.get().setImmobile(null);
-
-                annessiRepository.save(annessiOptional.get());
-                immobileRepository.save(immobileOptional.get());
+//                if (!this.isDelete) {
+                immobile.getListaAnnessi().remove(annesso);
+                immobileRepository.save(immobile);
+//                }
+                annesso.setImmobile(null);
+                annessiRepository.save(annesso);
 
             } else {
                 throw new EntityNotFoundException("Entity Not Found");
             }
 
+        } catch (Exception e) {
+            System.err.println("Errore durante la dissociazione dell'annesso: " + e.getMessage());
+            throw new RuntimeException("Errore durante la dissociazione dell'annesso", e);
         }
-        return ConverterImmobile.ConvertToDTO(immobileOptional.get());
-
+        this.isDelete = false;
+        return ConverterImmobile.ConvertToDTO(immobile);
     }
 
     public List<Object[]> getVillaWithGarden() {
@@ -137,12 +147,11 @@ public class ServiceImmobili {
     }
 
 
-
     public List<ImmobileDTO> findImmobiliAfter1996() {
         List<ImmobileDTO> listImmobiliBefore1996 = new ArrayList<>();
         List<Immobile> immobileList = immobileRepository.findImmobiliAfter1996();
-        if (!immobileList.isEmpty()){
-            for (Immobile immobile: immobileList) {
+        if (!immobileList.isEmpty()) {
+            for (Immobile immobile : immobileList) {
                 ImmobileDTO immobileDTO = ConverterImmobile.ConvertToDTO(immobile);
                 listImmobiliBefore1996.add(immobileDTO);
 
@@ -150,5 +159,19 @@ public class ServiceImmobili {
         }
 
         return listImmobiliBefore1996;
+    }
+
+    public List<ImmobileDTO> findImmobiliNullProp() {
+        List<ImmobileDTO> listImmobiliNullProp = new ArrayList<>();
+        List<Immobile> immobileList = immobileRepository.findImmobiliNullProp();
+        if (!immobileList.isEmpty()) {
+            for (Immobile immobile : immobileList) {
+                ImmobileDTO immobileDTO = ConverterImmobile.ConvertToDTO(immobile);
+                listImmobiliNullProp.add(immobileDTO);
+
+            }
+
+        }
+        return listImmobiliNullProp;
     }
 }

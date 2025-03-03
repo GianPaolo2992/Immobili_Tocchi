@@ -21,7 +21,9 @@ public class Proprietari {
     @Column(name = "nome")
     private String nome;
     @OneToMany(
-            mappedBy = "proprietari"
+            mappedBy = "proprietari",
+            cascade = CascadeType.ALL
+//            orphanRemoval = true
     )
     private List<Immobile> listaImmobili;
 

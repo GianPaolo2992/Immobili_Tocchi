@@ -13,7 +13,9 @@ public class Annessi {
     private Integer id;
 
 
-    @ManyToOne
+    @ManyToOne(
+            fetch = FetchType.LAZY
+    )
     @JoinColumn(name = "xidi")
     private Immobile immobile;
 

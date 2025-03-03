@@ -60,4 +60,7 @@ public class ControllerImmobile {
         return serviceImmobili.findImmobiliAfter1996();
     }
 
+    @GetMapping("/findImmobiliNullProp")
+    public List<ImmobileDTO> findImmobiliNullProp(){return serviceImmobili.findImmobiliNullProp();}
+
 }

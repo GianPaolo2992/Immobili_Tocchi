@@ -1,6 +1,7 @@
 package com.example.immobiliSpring.entity;
 
 import jakarta.persistence.*;
+import org.hibernate.engine.internal.Cascade;
 
 import java.util.List;
 
@@ -13,7 +14,10 @@ public class Immobile {
     @Column(name = "idi")
     private Integer id;
 
-    @ManyToOne
+    @ManyToOne(
+            cascade = CascadeType.PERSIST,
+            fetch = FetchType.LAZY
+    )
     @JoinColumn(name = "xidp")
     private Proprietari proprietari;
 
@@ -32,7 +36,9 @@ public class Immobile {
     @Column(name = "anno")
     private Integer anno;
     @OneToMany(
-            mappedBy = ("immobile")
+            mappedBy = ("immobile"),
+            fetch = FetchType.LAZY
+//            cascade = CascadeType.ALL
     )
     private List<Annessi> listaAnnessi;
 

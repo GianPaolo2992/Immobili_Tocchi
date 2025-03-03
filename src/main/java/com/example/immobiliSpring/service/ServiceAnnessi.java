@@ -8,6 +8,7 @@ import com.example.immobiliSpring.entity.Immobile;
 import com.example.immobiliSpring.repository.AnnessiRepository;
 import com.example.immobiliSpring.repository.ImmobileRepository;
 import jakarta.persistence.EntityNotFoundException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,25 +18,30 @@ import java.util.Optional;
 
 @Service
 public class ServiceAnnessi {
-    @Autowired
-    private  AnnessiRepository annessiRepository;
-    @Autowired
 
-    private  ImmobileRepository immobileRepository;
+    private final AnnessiRepository annessiRepository;
 
-//    public ServiceAnnessi(AnnessiRepository annessiRepository, ImmobileRepository immobileRepository) {
-//
-//        this.annessiRepository = annessiRepository;
-//        this.immobileRepository = immobileRepository;
-//    }
+    private final ImmobileRepository immobileRepository;
+    private final ConverterAnnessi converterAnnessi;
+
+
+    public ServiceAnnessi(AnnessiRepository annessiRepository, ImmobileRepository immobileRepository,ConverterAnnessi converterAnnessi) {
+
+        this.annessiRepository = annessiRepository;
+        this.immobileRepository = immobileRepository;
+        this.converterAnnessi = converterAnnessi;
+    }
+    public List<Annessi> searchAnnessi(String keyword) {
+        return annessiRepository.searchAnnessi(keyword);
+    }
 
     public List<AnnessiDTO> getAllAnnessi() {
         List<AnnessiDTO> listaAnnessiDTO = new ArrayList<>();
-        List<Annessi> listaAnnessi = annessiRepository.findAll();
+        List<Annessi> listaAnnessi = this.annessiRepository.findAll();
         if (!listaAnnessi.isEmpty()) {
             for (Annessi annessi : listaAnnessi) {
 
-                AnnessiDTO annessiDTO = ConverterAnnessi.ConvertToDTO(annessi);
+                AnnessiDTO annessiDTO = this.converterAnnessi.ConvertToDTO(annessi);
 
                 listaAnnessiDTO.add(annessiDTO);
 
@@ -46,9 +52,10 @@ public class ServiceAnnessi {
     }
 
     public AnnessiDTO getAllAnnessiById(Integer id) {
-        Optional<Annessi> annessiOpt = annessiRepository.findById(id);
+        Optional<Annessi> annessiOpt = this.annessiRepository.findById(id);
         if (annessiOpt.isPresent()) {
-            return ConverterAnnessi.ConvertToDTO(annessiOpt.get());
+
+            return this.converterAnnessi.ConvertToDTO(annessiOpt.get());
 
         } else {
             throw new EntityNotFoundException("Entity Not Found");
@@ -58,32 +65,32 @@ public class ServiceAnnessi {
     public AnnessiDTO insertAnnessi(AnnessiDTO annessiDTO) {
 
         Annessi annessiSaved = ConverterAnnessi.ConvertToEntity(annessiDTO);
-        annessiRepository.save(annessiSaved);
-        return ConverterAnnessi.ConvertToDTO(annessiSaved);
+        this.annessiRepository.save(annessiSaved);
+        return this.converterAnnessi.ConvertToDTO(annessiSaved);
     }
 
     public AnnessiDTO updateAnessi(Integer id, AnnessiDTO annessiDTO) {
-        Optional<Annessi> annessoOpt = annessiRepository.findById(id);
+        Annessi annessoOpt = this.annessiRepository.findById(id).orElseThrow(()-> new RuntimeException("Annessp non trovato"));
 
-        if (annessoOpt.isPresent()) {
-            annessiDTO.setId(id);
-          Annessi annessiUpdated = ConverterAnnessi.ConvertToEntity(annessiDTO);
-            annessiRepository.save(annessiUpdated);
-            return  ConverterAnnessi.ConvertToDTO(annessiUpdated);
-        } else {
-            throw new EntityNotFoundException("Entity Not Found");
-        }
+
+        annessoOpt = this.converterAnnessi.ConvertToEntityXUpdate(annessiDTO, annessoOpt);
+            this.annessiRepository.save(annessoOpt);
+            return  this.converterAnnessi.ConvertToDTO(annessoOpt);
+
     }
 
     public AnnessiDTO deleteAnessi(Integer id) {
-        Optional<Annessi> annessiOpt = annessiRepository.findById(id);
+        Optional<Annessi> annessiOpt = this.annessiRepository.findById(id);
 
         if (annessiOpt.isPresent()) {
-            Optional<Immobile> immobileOpt = immobileRepository.findById(annessiOpt.get().getImmobile().getId());
-            immobileOpt.ifPresent(immobile -> immobile.getListaAnnessi().remove(annessiOpt.get()));
+            if(annessiOpt.get().getImmobile() != null){
+                Optional<Immobile> immobileOpt = this.immobileRepository.findById(annessiOpt.get().getImmobile().getId());
+                immobileOpt.ifPresent(immobile -> immobile.getListaAnnessi().remove(annessiOpt.get()));
+            }
 
-            AnnessiDTO annessiDeleted = ConverterAnnessi.ConvertToDTO(annessiOpt.get());
-            annessiRepository.delete(annessiOpt.get());
+
+            AnnessiDTO annessiDeleted = this.converterAnnessi.ConvertToDTO(annessiOpt.get());
+            this.annessiRepository.delete(annessiOpt.get());
             return annessiDeleted;
         } else {
             throw new EntityNotFoundException("Entity not Found");
@@ -92,6 +99,6 @@ public class ServiceAnnessi {
     }
 
     public List<Object[]> getCountBoxIntoDB() {
-        return annessiRepository.countBoxIntoDB();
+        return this.annessiRepository.countBoxIntoDB();
     }
 }
