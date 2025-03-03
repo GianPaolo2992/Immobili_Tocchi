@@ -28,7 +28,6 @@ public class AnnessiRepositoryCustomImpl implements AnnessiRepositoryCustom {
 
         if (keyword != null && !keyword.isEmpty()) {
             if (isNumeric(keyword)) {
-
                 predicates.add(cb.like(cb.function("TO_CHAR", String.class, annessi.get("superficie"),cb.literal("9999999")), "%" + keyword + "%"));
             } else {
                 predicates.add(cb.like(annessi.get("tipo"), "%" + keyword + "%"));

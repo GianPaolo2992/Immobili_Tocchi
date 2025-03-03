@@ -1,6 +1,8 @@
 package com.example.immobiliSpring.repository;
 
 import com.example.immobiliSpring.entity.Proprietari;
+import com.example.immobiliSpring.repository.criterialBuilderRepo.ProprietariRepositoryCustom;
+import com.example.immobiliSpring.repository.criterialBuilderRepo.ProprietariRepositoryCustomImpl;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -10,7 +12,7 @@ import java.util.List;
 
 @Repository
 
-public interface ProrpietariRepository extends JpaRepository<Proprietari,Integer> {
+public interface ProrpietariRepository extends JpaRepository<Proprietari,Integer>, ProprietariRepositoryCustom {
     //--METRI DI UNO SPECIFICO PROPRIETARIO
     @Query("SELECT p.nome,p.cognome, SUM(i.superficie + a.superficie) " +
             "FROM Immobile i " +

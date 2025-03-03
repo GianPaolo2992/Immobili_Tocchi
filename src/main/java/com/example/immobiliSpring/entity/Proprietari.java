@@ -1,6 +1,6 @@
 package com.example.immobiliSpring.entity;
 
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+
 import jakarta.persistence.*;
 
 import java.util.List;

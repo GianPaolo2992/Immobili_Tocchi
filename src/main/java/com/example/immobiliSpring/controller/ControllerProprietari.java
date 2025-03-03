@@ -1,6 +1,7 @@
 package com.example.immobiliSpring.controller;
 
 import com.example.immobiliSpring.DTO.ProprietariDTO;
+import com.example.immobiliSpring.entity.Proprietari;
 import com.example.immobiliSpring.service.ServiceProprietari;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +17,10 @@ public class ControllerProprietari {
 
     public ControllerProprietari(ServiceProprietari serviceProprietari) {
         this.serviceProprietari = serviceProprietari;
+    }
+    @GetMapping("/search")
+    public List<Proprietari> searchProprietari(@RequestParam String keyword) {
+        return serviceProprietari.searchProprietari(keyword);
     }
 
     @GetMapping("/getProprietariById/{id}")

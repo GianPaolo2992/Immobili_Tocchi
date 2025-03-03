@@ -1,20 +1,15 @@
 package com.example.immobiliSpring.service;
 
-import com.example.immobiliSpring.DTO.ImmobileDTO;
 import com.example.immobiliSpring.DTO.ProprietariDTO;
 import com.example.immobiliSpring.converter.ConverterProprietari;
-import com.example.immobiliSpring.entity.Annessi;
 import com.example.immobiliSpring.entity.Immobile;
 import com.example.immobiliSpring.entity.Proprietari;
 import com.example.immobiliSpring.repository.ImmobileRepository;
 import com.example.immobiliSpring.repository.ProrpietariRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +19,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class ServiceProprietari {
 
-    private final ProrpietariRepository prorpietariRepository;
+    private final ProrpietariRepository proprietariRepository;
     private final ImmobileRepository immobileRepository;
     private final ConverterProprietari converterProprietari;
 
@@ -33,10 +28,12 @@ public class ServiceProprietari {
 //        this.immobileRepository = immobileRepository;
 //        this.converterProprietari = converterProprietari;
 //    }
-
+public List<Proprietari> searchProprietari(String keyword) {
+    return proprietariRepository.searchProprietari(keyword);
+}
     @Transactional
     public ProprietariDTO getProprietariById(Integer id) {
-        Optional<Proprietari> proprietariOPT = prorpietariRepository.findById(id);
+        Optional<Proprietari> proprietariOPT = proprietariRepository.findById(id);
 
         if (proprietariOPT.isPresent()) {
 
@@ -50,7 +47,7 @@ public class ServiceProprietari {
     @Transactional
     public List<ProprietariDTO> getAllProprietari() {
         List<ProprietariDTO> listaPropDTO = new ArrayList<>();
-        List<Proprietari> listaProprietari = prorpietariRepository.findAll();
+        List<Proprietari> listaProprietari = proprietariRepository.findAll();
 
         for (Proprietari prop : listaProprietari) {
             ProprietariDTO propDTO = this.converterProprietari.converterToDTO(prop);
@@ -66,7 +63,7 @@ public class ServiceProprietari {
         Proprietari propSaved = converterProprietari.converterToEntityXInsert(proprietariDTO);
         try {
 
-            prorpietariRepository.save(propSaved);
+            proprietariRepository.save(propSaved);
 
             System.out.println("Proprietario salvato: " + propSaved);
             return this.converterProprietari.converterToDTO(propSaved);
@@ -81,13 +78,13 @@ public class ServiceProprietari {
 
     //    @Transactional
     public ProprietariDTO updateProprietario(Integer id, ProprietariDTO proprietariDTO) {
-        Proprietari propOPT = prorpietariRepository.findById(id).orElseThrow(() -> new RuntimeException("Proprietario non trovato"));
+        Proprietari propOPT = proprietariRepository.findById(id).orElseThrow(() -> new RuntimeException("Proprietario non trovato"));
 
 
         propOPT = converterProprietari.converterToEntityXUpdate(proprietariDTO, propOPT);
         try {
 
-            prorpietariRepository.save(propOPT);
+            proprietariRepository.save(propOPT);
 
             System.out.println("Proprietario salvato: " + propOPT);
             return this.converterProprietari.converterToDTO(propOPT);
@@ -102,7 +99,7 @@ public class ServiceProprietari {
 
     //    @Transactional
     public ProprietariDTO deleteProprietario(Integer id) {
-        Proprietari propOPT = prorpietariRepository.findById(id).orElseThrow(() -> new RuntimeException("prop non trovato"));
+        Proprietari propOPT = proprietariRepository.findById(id).orElseThrow(() -> new RuntimeException("prop non trovato"));
         try {
             if (propOPT.getListaImmobili() != null) {
                 List<Immobile> immobileListCopy = new ArrayList<>(propOPT.getListaImmobili());
@@ -113,7 +110,7 @@ public class ServiceProprietari {
                     immobileRepository.save(immobileEntity);
 
                 }
-                prorpietariRepository.delete(propOPT);
+                proprietariRepository.delete(propOPT);
                 return this.converterProprietari.converterToDTO(propOPT);
             } else {
                 throw new EntityNotFoundException("Lista immobili null");
@@ -126,7 +123,7 @@ public class ServiceProprietari {
 
     @Transactional
     public ProprietariDTO AssocateImmobile(Integer idProp, Integer idImmbl) {
-        Optional<Proprietari> propOPT = prorpietariRepository.findById(idProp);
+        Optional<Proprietari> propOPT = proprietariRepository.findById(idProp);
         Optional<Immobile> immobileOPT = immobileRepository.findById(idImmbl);
         if (propOPT.isPresent() && immobileOPT.isPresent()) {
             Proprietari propAssociate = propOPT.get();
@@ -137,7 +134,7 @@ public class ServiceProprietari {
                 propAssociate.getListaImmobili().add(immblAssociate);
                 immblAssociate.setProprietari(propAssociate);
 
-                prorpietariRepository.save(propOPT.get());
+                proprietariRepository.save(propOPT.get());
                 immobileRepository.save(immblAssociate);
 
             } else {
@@ -150,19 +147,19 @@ public class ServiceProprietari {
     }
 
     public List<Object[]> getSumSuperficeProp() {
-        return prorpietariRepository.sumSuperficeProp();
+        return proprietariRepository.sumSuperficeProp();
     }
 
     public List<Object> sumSuperficePropName(String nome, String cognome) {
-        return prorpietariRepository.sumSuperficePropName(nome, cognome);
+        return proprietariRepository.sumSuperficePropName(nome, cognome);
     }
 
     public List<Object[]> getPropOfVilla() {
-        return prorpietariRepository.propOfVilla();
+        return proprietariRepository.propOfVilla();
     }
 
     public List<Object[]> getPropAppartmentWithBox() {
-        return prorpietariRepository.propAppartmentWithBox();
+        return proprietariRepository.propAppartmentWithBox();
     }
 
     public List<Object[]> getPropTotVani() {
@@ -175,11 +172,11 @@ public class ServiceProprietari {
 //            }
 //        }
 //        return listPropVaniDTO;
-        return prorpietariRepository.propTotVani();
+        return proprietariRepository.propTotVani();
     }
 
     public List<Object[]> getOwnersWithMore400MQ() {
-        return prorpietariRepository.ownersWithMore400MQ();
+        return proprietariRepository.ownersWithMore400MQ();
     }
 
 }
