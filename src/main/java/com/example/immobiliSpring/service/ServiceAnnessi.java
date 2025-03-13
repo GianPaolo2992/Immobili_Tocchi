@@ -5,6 +5,7 @@ import com.example.immobiliSpring.controller.ControllerAnnessi;
 import com.example.immobiliSpring.converter.ConverterAnnessi;
 import com.example.immobiliSpring.entity.Annessi;
 import com.example.immobiliSpring.entity.Immobile;
+import com.example.immobiliSpring.entity.User;
 import com.example.immobiliSpring.repository.AnnessiRepository;
 import com.example.immobiliSpring.repository.ImmobileRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -31,8 +32,8 @@ public class ServiceAnnessi {
         this.immobileRepository = immobileRepository;
         this.converterAnnessi = converterAnnessi;
     }
-    public List<Annessi> searchAnnessi(String keyword) {
-        return annessiRepository.searchAnnessi(keyword);
+    public List<AnnessiDTO> searchAnnessi(String keyword) {
+        return annessiRepository.searchAnnessi(keyword).stream().map(converterAnnessi::ConvertToDTO).toList();
     }
 
     public List<AnnessiDTO> getAllAnnessi() {

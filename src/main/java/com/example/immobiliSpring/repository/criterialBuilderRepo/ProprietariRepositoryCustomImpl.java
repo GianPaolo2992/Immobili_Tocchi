@@ -25,9 +25,9 @@ public class ProprietariRepositoryCustomImpl implements ProprietariRepositoryCus
 
         List<Predicate> predicates = new ArrayList<>();
 
-        if (keyword != null && !keyword.isEmpty()) {
-            Predicate nomePredicate = cb.like(cb.lower(proprietari.get("nome")), "%" + keyword + "%");
-            Predicate cognomePredicate = cb.like(cb.lower(proprietari.get("cognome")), "%" + keyword + "%");
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            Predicate nomePredicate = cb.like(cb.lower(proprietari.get("nome")), "%" + keyword.trim() + "%");
+            Predicate cognomePredicate = cb.like(cb.lower(proprietari.get("cognome")), "%" + keyword.trim()+ "%");
             // Utilizza OR per combinare i predicati
             predicates.add(cb.or(nomePredicate, cognomePredicate));
         }

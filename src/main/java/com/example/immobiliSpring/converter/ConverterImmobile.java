@@ -219,7 +219,6 @@ public Immobile ConvertToEntityXUpdate(ImmobileDTO immobileDTO, Immobile immobil
                 annesso.setImmobile(null);
             }
         }
-
         immobile.setListaAnnessi(annessiList);
     }
 

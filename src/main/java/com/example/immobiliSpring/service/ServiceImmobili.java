@@ -1,12 +1,9 @@
 package com.example.immobiliSpring.service;
 
-import com.example.immobiliSpring.DTO.AnnessiDTO;
 import com.example.immobiliSpring.DTO.ImmobileDTO;
-import com.example.immobiliSpring.converter.ConverterAnnessi;
 import com.example.immobiliSpring.converter.ConverterImmobile;
 import com.example.immobiliSpring.entity.Annessi;
 import com.example.immobiliSpring.entity.Immobile;
-import com.example.immobiliSpring.entity.Proprietari;
 import com.example.immobiliSpring.repository.AnnessiRepository;
 import com.example.immobiliSpring.repository.ImmobileRepository;
 import com.example.immobiliSpring.repository.ProrpietariRepository;
@@ -30,6 +27,9 @@ public class ServiceImmobili {
         this.annessiRepository = annessiRepository;
         this.converterImmobile = converterImmobile;
         this.proprietariRepository = proprietariRepository;
+    }
+    public List<ImmobileDTO> searchImmobile(String keyword) {
+        return immobileRepository.searchImmobile(keyword).stream().map(ConverterImmobile::ConvertToDTO).toList();
     }
 
     public List<ImmobileDTO> getAllImmobili() {

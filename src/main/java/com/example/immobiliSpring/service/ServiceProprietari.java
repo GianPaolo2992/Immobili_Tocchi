@@ -28,8 +28,9 @@ public class ServiceProprietari {
 //        this.immobileRepository = immobileRepository;
 //        this.converterProprietari = converterProprietari;
 //    }
-public List<Proprietari> searchProprietari(String keyword) {
-    return proprietariRepository.searchProprietari(keyword);
+public List<ProprietariDTO> searchProprietari(String keyword) {
+
+    return proprietariRepository.searchProprietari(keyword).stream().map(converterProprietari::converterToDTO).toList();
 }
     @Transactional
     public ProprietariDTO getProprietariById(Integer id) {

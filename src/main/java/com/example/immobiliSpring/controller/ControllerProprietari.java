@@ -19,7 +19,7 @@ public class ControllerProprietari {
         this.serviceProprietari = serviceProprietari;
     }
     @GetMapping("/search")
-    public List<Proprietari> searchProprietari(@RequestParam String keyword) {
+    public List<ProprietariDTO> searchProprietari(@RequestParam String keyword) {
         return serviceProprietari.searchProprietari(keyword);
     }
 

@@ -2,6 +2,7 @@ package com.example.immobiliSpring.repository;
 
 
 import com.example.immobiliSpring.entity.Immobile;
+import com.example.immobiliSpring.repository.criterialBuilderRepo.ImmobileRepositoryCustom;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -10,7 +11,7 @@ import java.util.List;
 
 @Repository
 
-public interface ImmobileRepository extends JpaRepository<Immobile,Integer> {
+public interface ImmobileRepository extends JpaRepository<Immobile,Integer>, ImmobileRepositoryCustom {
 
 @Query("SELECT i.tipo, a.tipo, COUNT(i.tipo) " +
         "FROM Immobile i " +

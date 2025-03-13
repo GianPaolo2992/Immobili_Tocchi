@@ -1,6 +1,7 @@
 package com.example.immobiliSpring.controller;
 
 import com.example.immobiliSpring.DTO.ImmobileDTO;
+import com.example.immobiliSpring.DTO.ProprietariDTO;
 import com.example.immobiliSpring.service.ServiceImmobili;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,7 +16,10 @@ public class ControllerImmobile {
     public ControllerImmobile(ServiceImmobili serviceImmobili) {
         this.serviceImmobili = serviceImmobili;
     }
-
+    @GetMapping("/search")
+    public List<ImmobileDTO> searchProprietari(@RequestParam String keyword) {
+        return serviceImmobili.searchImmobile(keyword);
+    }
     @GetMapping("/getAllImmobili")
     public List<ImmobileDTO> getAllImmobili(){
         return serviceImmobili.getAllImmobili();

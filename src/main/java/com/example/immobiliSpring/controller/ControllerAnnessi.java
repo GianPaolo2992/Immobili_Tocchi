@@ -17,7 +17,7 @@ public class ControllerAnnessi {
         this.serviceAnnessi = serviceAnnessi;
     }
     @GetMapping("/search")
-    public List<Annessi> searchAnnessi(@RequestParam String keyword) {
+    public List<AnnessiDTO> searchAnnessi(@RequestParam String keyword) {
         return serviceAnnessi.searchAnnessi(keyword);
     }
 
