@@ -16,10 +16,11 @@ private final SecretKey secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS256);
         return Jwts.builder()
                 .setSubject(username)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + 3600000))  // 1 hour
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60))  // 1 hour
                 .signWith(secretKey)
                 .compact();
     }
+
     public String extractUsername(String token) {
         return Jwts.parser()
                 .setSigningKey(secretKey)
